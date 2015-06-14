@@ -1,0 +1,22 @@
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/style.css') }}">
+<meta charset="utf-8">
+<title>MatchRx Login</title>
+</head>
+<body>
+<div class="wrapper">
+<div id="login">
+<h2>Twitter Handle:</h2>
+</div>
+<div id="querying">
+<form action="/output" method="POST">
+<input id="query-box1" type="text" name="handle" value={{user}}>
+<form action="/output" method="POST">
+<input type="submit" value="Submit">
+</form>
+</div>
+</div>
+</div>
+</body>
+</html>

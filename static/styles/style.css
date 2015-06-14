@@ -1,0 +1,86 @@
+body {
+    background-color: #564792;
+    
+}
+
+#intro{
+    margin-top: 7em;
+    text-align: center;
+    color: #d8d1f4;
+    font-size: 30px;
+}
+
+#login{
+    color:white;
+    float: left;
+    margin-top: 5em;
+    margin-left: 40%;
+    font-size: 15px;
+}
+
+#querying{
+    float: left;
+    margin-top: 5em;
+    margin-left: 40%;
+    font-size: 15px;
+    font-color:black;
+}
+
+
+#output1{
+    text-align: center;
+    margin-top: :auto;
+    color: #d8d1f4;
+    font-size: 25px;
+}
+
+#output2{
+    text-align: justify;
+    margin-top: :auto;
+    color: #d8d1f4;
+    font-size: 20px;
+    margin-left: 3em;
+    margin-right: 3em;
+}
+
+
+#h1{
+    text-align: center;
+    color: #d8d1f4;
+    font-size: 30px;
+}
+
+#h2{
+    text-align: center;
+    color: #d8d1f4;
+    font-size: 25px;
+}
+
+#h3{
+    text-align: justify;
+    color: #d8d1f4;
+    font-size: 20px;
+}
+
+
+#search-button1 {
+    margin-left: 1em;
+    background-color: #d8d1f4;
+    padding: 5.2px;
+}
+
+#query-box1 {
+    margin-left: 1em;
+    margin-right: 1em;
+    background-color: white;
+    height: 20px;
+    width: 150px;
+    font: black;
+    border: 1px solid #d8d1f4;
+}
+
+#query-box1:focus {
+    color: white;
+}
+
+	

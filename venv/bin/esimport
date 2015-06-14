@@ -1,0 +1,95 @@
+#!/Users/tejaswineesohoni/match/venv/bin/python
+
+# Copyright 2012 Erik-Jan van Baaren (erikjan@gmail.com)
+# This tool is released as part of the python package ESClient which can be found on PyPI.org.
+
+import esclient
+import argparse
+import sys
+import json
+
+parser = argparse.ArgumentParser(description="Import a dump from esdump, optionally overriding the index name and/or document type." +
+" This tool will auto-detect the file type (plain, gz, bzip2) based on the file extension.\n" +
+" !! Please note that you have to create the appropriate mappings yourself !!")
+
+parser.add_argument('--url', '-u', required=True, help="The full URL to the ElasticSearch server, including port")
+parser.add_argument('--file', '-f', required=False, help="The input file to read from. By default esimport will read from stdin")
+parser.add_argument('--index', '-i', required=False, help="Override the index where data will end up")
+parser.add_argument('--doctype', '-t', required=False, help="Override the document type")
+parser.add_argument('--recreate', '-r', required=False, action='store_true', help="Delete and create the index again")
+parser.add_argument('--mappingfile', '-m', required=False, help="The mapping file for the index")
+arguments = parser.parse_args()
+
+es = esclient.ESClient(arguments.url)
+
+if arguments.file:
+    file_lower = arguments.file.lower()
+    if file_lower.endswith(".gz"):
+        import gzip
+        f = gzip.open(arguments.file, "rb")
+    elif file_lower.endswith(".bz2"):
+        import bz2
+        f = bz2.BZ2File(arguments.file, "rb")
+    else:
+        f = open(arguments.file, "r")
+else:
+    # use stdin as a file
+    f = sys.stdin
+
+def fail_exit(msg):
+    sys.stderr.write(msg + "\n")
+    sys.exit(1)
+
+if arguments.recreate:
+    if not arguments.index:
+        fail_exit("index argument is required when recreate is given")
+
+    delete_result = es.delete_index(arguments.index)
+
+    create_result = es.create_index(arguments.index)
+    if not create_result:
+        fail_exit("create index failed")
+
+if arguments.mappingfile:
+    mapping_file = open(arguments.mappingfile, "r")
+    mappings = json.load(mapping_file)
+    types = mappings.itervalues().next()
+
+    for elastic_type, mapping in types.iteritems():
+        mapping_obj = { elastic_type : mapping }
+        put_mapping_result = es.put_mapping(mapping_obj, elastic_type, [arguments.index])
+
+        if 'error' in put_mapping_result:
+            fail_exit("put mapping failed: "+ str(put_mapping_result['error']))
+
+counter = 0
+for doc in f:
+    doc = json.loads(doc)
+    
+    if arguments.index:
+        index = arguments.index
+    else:
+        index = doc["_index"]
+    
+    if arguments.doctype:
+        doctype = arguments.doctype
+    else:
+        doctype = doc["_type"]
+
+    try:    
+        parent = doc["_parent"]
+    except KeyError:
+        parent = None
+
+    try:
+        routing = doc["_routing"]
+    except KeyError:
+        routing = None
+
+    if not es.index(index, doctype, doc["_source"], docid=doc["_id"], parent=parent, routing=routing):
+        fail_exit("Error occured while indexing documents, stopping!");
+    else:
+        counter += 1
+
+f.close()
+print "Indexing of %d documents completed" % (counter)
