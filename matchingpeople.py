@@ -59,7 +59,7 @@ def fillElasticSearch():
   
 def main():
   fillElasticSearch()
-  findmatchingpeople("@marissamayer")
+  findmatchingpeople()
 
    
 if __name__ == '__main__':
